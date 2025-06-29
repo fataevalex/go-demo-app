@@ -37,7 +37,7 @@ func main() {
 
 	initOptions()
 
-	AppName := flag.String("name", "k8sdiy", "application name")
+	AppName := flag.String("name", "g0-demo-app", "application name")
 	AppRole := flag.String("role", "api", "app role: api data ascii img ml5 iot")
 	AppPort := flag.String("port", "8080", "application port")
 	Cache = flag.String("cache", "true", "cache enable")
@@ -165,5 +165,5 @@ func db() {
 	if err != nil {
 		log.Printf("CreateErr: %s", err) // proper error handling instead of panic in your app
 	}
-
+	//
 }
