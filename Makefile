@@ -7,7 +7,7 @@ PLATFORM=linux/amd64
 
 BUILDER = docker
 
-TAG=ghcr.io/fataevalex/k8sdiy
+TAG=ghcr.io/fataevalex/go-demo-app
 
 BUILD=$$(git rev-parse HEAD|cut -c1-7)
 
