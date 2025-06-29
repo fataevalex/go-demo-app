@@ -82,9 +82,12 @@ jobs:
          git config user.email "<>"
          git add helm/values.yaml
          git commit -m "update code version to ${{ steps.vars.outputs.sha_short }}"
-     
+
      - name: Push changes
        uses: ad-m/github-push-action@master
        with:
          github_token: ${{ secrets.GITHUB_TOKEN }}
          branch: ${{ github.ref }}
+         github_url: https://github.com
+         push_to_submodules: on-demand
+         directory: .
