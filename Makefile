@@ -7,7 +7,7 @@ PLATFORM=linux/amd64
 
 BUILDER = docker
 
-TAG=denvasyliev/k8sdiy
+TAG=ghcr.io/fataevalex/go-demo-app
 
 BUILD=$$(git rev-parse HEAD|cut -c1-7)
 
@@ -33,3 +33,4 @@ lint:
 clean:
 	@echo "Cleaning up..."
 	rm -rf bin
+
