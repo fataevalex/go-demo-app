@@ -33,3 +33,4 @@ lint:
 clean:
 	@echo "Cleaning up..."
 	rm -rf bin
+
