@@ -83,8 +83,12 @@ jobs:
          git add helm/values.yaml
          git commit -m "update code version to ${{ steps.vars.outputs.sha_short }}"
 
-     - name: Push changes
-       uses: ad-m/github-push-action@master
+     - name: Push changes with commit
+       uses: peter-evans/create-pull-request@v5
        with:
-         github_token: ${{ secrets.GITHUB_TOKEN }}
-         branch: master
+         token: ${{ secrets.GITHUB_TOKEN }}
+         commit-message: "update image.tag"
+         title: "Update image.tag"
+         body: |
+           This PR updates image.tag to new build
+         branch: ci/image-tag-update
