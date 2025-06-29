@@ -187,3 +187,4 @@ Based on the provided code snippets, here's a textual diagram illustrating the p
    - The image is converted to an ASCII string.
 6. **Return ASCII String:**
    - The final ASCII string is sent back through NATS, which is then relayed to the API layer.
+
