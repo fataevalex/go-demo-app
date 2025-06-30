@@ -1,95 +1,96 @@
 name: Continuous Integration
 
-on:
+on: 
   push:
     paths:
       - 'src/**'
-#      - 'helm/**'
+      - 'helm/**'
 
 jobs:
   ci:
     name: CI
     runs-on: ubuntu-latest
     env:
-      DOCKER_BUILDKIT: "1"
-
+       DOCKER_BUILDKIT: "1"
+ 
     steps:
+ 
+     - name: Checkout code
+       uses: actions/checkout@v2
+ 
+     - name: Run linter
+       run: make lint
+ 
+     - name: Run unit tests
+       run: make unit-test
 
-      - name: Checkout code
-        uses: actions/checkout@v2
+     - name: Log in to GHCR
+       uses: docker/login-action@v3
+       with:
+         registry: ghcr.io
+         username: ${{ github.actor }}
+         password: ${{ secrets.GITHUB_TOKEN }}
+ 
+     - name: Declare SHA vars to use on other actions
+       id: vars
+       shell: bash
+       run: |
+         echo "GITHUB_SHA: ${GITHUB_SHA}"
+         echo "::set-output name=sha_short::${GITHUB_SHA::7}"  
+ 
+     - name: Run build
+       run: make build
 
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+     - name: Run push
+       run: make push
 
-      - name: Declare SHA vars to use on other actions
-        id: vars
-        shell: bash
-        run: |
-          echo "GITHUB_SHA: ${GITHUB_SHA}"
-          echo "::set-output name=sha_short::${GITHUB_SHA::7}"  
+#     - name: Build and Push to GCR
+#       uses: raccoondev/push-docker-gcr
+#       with:
+#         gcr_host: gcr.io
+#         image_name: 
+#         image_tag: latest
+#         env:
+#           GCLOUD_SERVICE_KEY: ${{ secrets.GCLOUD_SERVICE_KEY }}
+#           GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }}
 
-      - name: Run build
-        run: make build
-
-      - name: Run push
-        run: make push
-
-  #     - name: Build and Push to GCR
-  #       uses: raccoondev/push-docker-gcr
-  #       with:
-  #         gcr_host: gcr.io
-  #         image_name:
-  #         image_tag: latest
-  #         env:
-  #           GCLOUD_SERVICE_KEY: ${{ secrets.GCLOUD_SERVICE_KEY }}
-  #           GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }}
-
-  #     - name: Build and Push
-  #       uses: docker/build-push-action@v2
-  #       with:
-  #         push: true
-  #         tags: denvasyliev/k8sdiy:build-${{ steps.vars.outputs.sha_short }}
-
+#     - name: Build and Push
+#       uses: docker/build-push-action@v2
+#       with:
+#         push: true
+#         tags: denvasyliev/k8sdiy:build-${{ steps.vars.outputs.sha_short }}
+ 
   cd:
     name: CD
     needs: ci
     runs-on: ubuntu-latest
-
+ 
     steps:
-
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Declare SHA vars to use on other actions
-        id: vars
-        shell: bash
-        run: |
-          echo "GITHUB_SHA: ${GITHUB_SHA}"
-          echo "::set-output name=sha_short::${GITHUB_SHA::7}"
-
-      - name: Update current version
-        uses: mikefarah/yq@3.3.2
-        with:
-          cmd: yq w -i helm/values.yaml image.tag build-${{ steps.vars.outputs.sha_short }}
-
-      - name: Setup git config
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "<>"
-          git add helm/values.yaml
-          git commit -m "update code version to ${{ steps.vars.outputs.sha_short }}"
-
-      - name: Push changes with commit
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "update image.tag"
-          title: "Update image.tag"
-          body: |
-            This PR updates image.tag to new build
-          branch: ci/image-tag-update
-
+   
+     - name: Checkout code
+       uses: actions/checkout@v2
+   
+     - name: Declare SHA vars to use on other actions
+       id: vars
+       shell: bash
+       run: |
+         echo "GITHUB_SHA: ${GITHUB_SHA}"
+         echo "::set-output name=sha_short::${GITHUB_SHA::7}"
+   
+     - name: Update current version
+       uses: mikefarah/yq@3.3.2
+       with: 
+         cmd: yq w -i helm/values.yaml image.tag build-${{ steps.vars.outputs.sha_short }}
+        
+     - name: Setup git config
+       run: |
+         git config user.name "GitHub Actions"
+         git config user.email "<>"
+         git add helm/values.yaml
+         git commit -m "update code version to ${{ steps.vars.outputs.sha_short }}"
+     
+     - name: Push changes
+       uses: ad-m/github-push-action@master
+       with:
+         github_token: ${{ secrets.ACTIONS_TOKEN }}
+         branch: master

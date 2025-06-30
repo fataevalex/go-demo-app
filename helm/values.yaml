@@ -4,7 +4,14 @@ app:
   port: 80
 image:
   name: ghcr.io/fataevalex/go-demo-app
-  tag: build-edebe8c
+  tag: build-2df9a62
+front:
+  version: 3.0.1
+  replicas: 1
+  canary: 0
+  header: ""
+  port: 8080
+  tag: front-v3.0.2
 api:
   replicas: 1
   canary: 0
@@ -20,6 +27,11 @@ img:
   canary: 0
   header: ""
   port: 8080
+ml5:
+  replicas: 1
+  canary: 0
+  header: ""
+  port: 8080
 data:
   replicas: 1
   port: 8080
@@ -27,30 +39,19 @@ data:
 db:
   svc: db
   port: 3306
+cache:
+  svc: cache
+  port: 6379
 nats:
   enable: true
   size: 1
   service:
-    name: nats
+    name: nats-cluster
     port: 4222
-ingress:
-  enable: true
+ns:
+  enable: false
 api-gateway:
   image:
-    tag: 0.53.0
+    tag: 0.51.2
   service:
     type: NodePort
-redis:
-  architecture: standalone
-  auth:
-    enabled: false
-  service:
-    name: redis-headless
-mysql:
-  service:
-    name: mysql
-gateway:
-  hostname: "demo.example.com"
-  parentGateway: "eg"
-  weight: 1
-  path: /
