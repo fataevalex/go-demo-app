@@ -4,7 +4,7 @@ app:
   port: 80
 image:
   name: ghcr.io/fataevalex/go-demo-app
-  tag: build-c8567c2
+  tag: build-9747ed8
 front:
   version: 3.0.1
   replicas: 1
