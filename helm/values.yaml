@@ -4,7 +4,7 @@ app:
   port: 80
 image:
   name: ghcr.io/fataevalex/go-demo-app
-  tag: build-2df9a62
+  tag: build-27e9887
 api:
   replicas: 1
   canary: 0
