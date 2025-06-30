@@ -25,26 +25,31 @@ spec:
           - "-role"
           - "api"
           - "-server"
-          - {{ .Release.Name }}-{{ .Values.nats.service.name }}
+          - {{ .Values.nats.service.name }}
         imagePullPolicy: Always
         env:
           - name: APP_BACKEND
             value: "iscii"
           - name: APP_DATASTORE
             value: "data"
+          - name: APP_DB
+            value: "root@tcp(db:3306)/demo"
           - name: APP_CACHE
-            value: "{{ .Release.Name }}-{{ .Values.redis.service.name }}"
+            value: "{{ .Values.cache.svc }}"
           - name: APP_LICENSE
             valueFrom:
               secretKeyRef:
                 name: {{ .Release.Name }}-secret
                 key: license
+        volumeMounts:
+        - name: data
+          mountPath: /data
         resources:
           requests:
             cpu: 100m
             memory: 100Mi
         ports:
-        - containerPort: {{ .Values.api.port }}
+        - containerPort: 8080
           name: http
         securityContext:
         livenessProbe:
@@ -59,5 +64,8 @@ spec:
             port: {{ .Values.api.port }}
           initialDelaySeconds: 0
           periodSeconds: 3
-
+      volumes:
+        - name: data
+          configMap:
+            name: {{ .Release.Name }}-configmap
 
